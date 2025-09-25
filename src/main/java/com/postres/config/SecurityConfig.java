@@ -47,6 +47,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests((authorize) -> {
                     authorize.requestMatchers("/api/v1/auth/**").permitAll(); // Permitir rutas de autenticación sin restricciones
                     authorize.requestMatchers(HttpMethod.GET, "/api/v1/categorias", "/api/v1/categorias/{id}").permitAll();
+                    authorize.requestMatchers(HttpMethod.GET, "/api/v1/productos", "/api/v1/productos/{id}").permitAll();
                     authorize.requestMatchers(HttpMethod.OPTIONS, "/**").permitAll(); // Permitir preflight (CORS)
                     authorize.anyRequest().authenticated(); // Requerir autenticación para el resto
                 })
