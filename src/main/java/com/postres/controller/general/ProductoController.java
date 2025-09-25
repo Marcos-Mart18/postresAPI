@@ -1,6 +1,7 @@
 package com.postres.controller.general;
 
 import com.postres.dto.ProductoDTO;
+import com.postres.entity.Producto;
 import com.postres.service.Impl.CloudinaryService;
 import com.postres.service.service.ProductoService;
 import org.hibernate.service.spi.ServiceException;
@@ -24,9 +25,9 @@ public class ProductoController {
     }
 
     @GetMapping
-    public ResponseEntity<List<ProductoDTO>> listAll() throws ServiceException {
+    public ResponseEntity<List<Producto>> listAll() throws ServiceException {
 
-        return ResponseEntity.ok(productoService.findAll());
+        return ResponseEntity.ok(productoService.findAllProductos());
     }
 
     @GetMapping("/{id}")

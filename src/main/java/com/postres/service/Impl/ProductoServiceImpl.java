@@ -3,6 +3,7 @@ package com.postres.service.Impl;
 import com.postres.controller.exceptions.ResourceNotFoundException;
 import com.postres.dto.ProductoDTO;
 import com.postres.entity.Categoria;
+import com.postres.entity.Estado;
 import com.postres.entity.Producto;
 import com.postres.mappers.ProductoMapper;
 import com.postres.repository.CategoriaRepository;
@@ -111,6 +112,17 @@ public class ProductoServiceImpl implements ProductoService {
             return productoMapper.toDTOs(productos);
         }catch (Exception e) {
             throw new ServiceException("Error al listar las categorías",e);
+        }
+    }
+
+    @Override
+    public List<Producto> findAllProductos() {
+        try {
+            // Obtener y devolver la lista de productos directamente
+            return productoRepository.findAll();
+        } catch (Exception e) {
+            // Lanzar una excepción personalizada si ocurre algún error
+            throw new ServiceException("Error al listar los productos", e);
         }
     }
 }
