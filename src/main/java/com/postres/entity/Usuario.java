@@ -31,8 +31,8 @@ public class Usuario {
     private String apellidos;
     @Column(name = "dni",columnDefinition = "char(8)")
     private String dni;
-    @Column(name = "foto_url",columnDefinition = "varchar2(200)")
-    private String fotoUrl;
+    @Column(name = "profile_foto_url",columnDefinition = "varchar2(200)")
+    private String profileFotoUrl;
     @Column(name = "correo",columnDefinition = "varchar2(320)")
     private String correo;
     @Column(name = "is_active",columnDefinition = "char(1)")

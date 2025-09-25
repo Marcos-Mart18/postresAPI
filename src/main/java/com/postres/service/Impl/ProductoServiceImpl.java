@@ -33,7 +33,6 @@ public class ProductoServiceImpl implements ProductoService {
 
             Producto producto = new Producto();
             producto.setNombre(productoDTO.getNombre());
-            producto.setFotoUrl(productoDTO.getFotoUrl());
             producto.setPrecio(productoDTO.getPrecio());
             producto.setDescripcion(productoDTO.getDescripcion());
             producto.setCategoria(categoria);  // Asignar la categoría encontrada
@@ -57,7 +56,6 @@ public class ProductoServiceImpl implements ProductoService {
 
             // Actualizar los campos del producto con los valores del DTO
             producto.setNombre(productoDTO.getNombre());
-            producto.setFotoUrl(productoDTO.getFotoUrl());
             producto.setPrecio(productoDTO.getPrecio());
             producto.setDescripcion(productoDTO.getDescripcion());
 

@@ -3,13 +3,13 @@ package com.postres.controller.general;
 import com.postres.dto.LoginDto;
 import com.postres.dto.RegisterDto;
 import com.postres.dto.RegisterRepartidorDTO;
+import com.postres.service.Impl.CloudinaryService;
 import com.postres.service.service.AuthService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -18,10 +18,11 @@ import java.util.Map;
 @RequestMapping("/api/v1/auth")
 public class AuthController {
     private final AuthService authService;
+    private final CloudinaryService cloudinaryService;
 
-    public AuthController(AuthService authService) {
-
+    public AuthController(AuthService authService,CloudinaryService cloudinaryService) {
         this.authService = authService;
+        this.cloudinaryService = cloudinaryService;
     }
 
     // Endpoint para login
@@ -112,6 +113,19 @@ public class AuthController {
         } catch (RuntimeException e) {
             // Respuesta en caso de error
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        }
+    }
+
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_USER') or hasRole('ROLE_CLIENTE')")
+    @PostMapping("/uploadProfileImage/{usuarioId}")
+    public String uploadProfileImage(@PathVariable Long usuarioId, @RequestParam("file") MultipartFile file) {
+        try {
+            // Subir la foto de perfil y obtener la URL
+            String imageUrl = cloudinaryService.uploadProfileImage(file, usuarioId);
+            return "Foto de perfil subida correctamente. URL: " + imageUrl;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "Error al subir la foto de perfil: " + e.getMessage();
         }
     }
 }
