@@ -1,0 +1,19 @@
+server:
+  port: 9090
+
+spring:
+  datasource:
+    url: jdbc:oracle:thin:@localhost:1521:xe
+    username: C##POSTRES
+    password: 1234567
+    driver-class-name: oracle.jdbc.OracleDriver
+
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: true
+    org:
+      hibernate:
+        dialect:
+          Oracle10gDialect: org.hibernate.dialect.Oracle10gDialect
+
