@@ -1,10 +1,7 @@
 package com.postres.service.Impl;
 
 import com.postres.config.JwtTokenProvider;
-import com.postres.dto.LoginDto;
-import com.postres.dto.RegisterDto;
-import com.postres.dto.RegisterRepartidorDTO;
-import com.postres.dto.RepartidorDTO;
+import com.postres.dto.*;
 import com.postres.entity.*;
 import com.postres.repository.PersonaRepository;
 import com.postres.repository.RepartidorRepository;
@@ -22,10 +19,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class AuthServiceImpl implements AuthService{
@@ -48,7 +43,7 @@ public class AuthServiceImpl implements AuthService{
 
 
     @Override
-    public Map<String, String> login(LoginDto loginDto) {
+    public Map<String, Object> login(LoginDto loginDto) {
         // 1. Autenticar usuario
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(loginDto.getUsername(), loginDto.getPassword())
@@ -59,6 +54,7 @@ public class AuthServiceImpl implements AuthService{
         Usuario usuario = usuarioRepository.findByUsername(loginDto.getUsername())
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
         String nombreCompleto = usuario.getNombres() + " " + usuario.getApellidos();
+
 
         // 3. Generar Access Token
         String accessToken = jwtTokenProvider.generateToken(authentication, nombreCompleto);
@@ -73,12 +69,25 @@ public class AuthServiceImpl implements AuthService{
         tokenEntity.setExpiryDate(new Date(System.currentTimeMillis() + 604800000));
         refreshTokenService.save(tokenEntity);
 
-        // 6. Retornar ambos tokens
-        Map<String, String> tokens = new HashMap<>();
-        tokens.put("accessToken", accessToken);
-        tokens.put("refreshToken", refreshToken);
+        List<String> roles = usuario.getUsuarioRoles().stream()
+                .map(usuarioRol -> usuarioRol.getRol().getNombre())
+                .collect(Collectors.toList());
 
-        return tokens;
+        LoginResponseDto userResponse = new LoginResponseDto(
+                usuario.getIdUsuario(),
+                usuario.getNombres(),
+                usuario.getApellidos(),
+                usuario.getCorreo(),
+                usuario.getProfileFotoUrl(),
+                roles
+        );
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("accessToken", accessToken);
+        response.put("refreshToken", refreshToken);
+        response.put("user", userResponse);
+
+        return response;
     }
 
     @Override
