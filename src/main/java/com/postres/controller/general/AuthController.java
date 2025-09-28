@@ -30,7 +30,7 @@ public class AuthController {
     public ResponseEntity<?> login(@RequestBody LoginDto loginDto) {
         try {
             // Generar Access Token y Refresh Token
-            Map<String, String> tokens = authService.login(loginDto);
+            Map<String, Object> tokens = authService.login(loginDto);
 
             return ResponseEntity.ok(tokens);
         } catch (RuntimeException e) {
