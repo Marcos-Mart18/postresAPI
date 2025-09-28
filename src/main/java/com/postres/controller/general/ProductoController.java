@@ -1,5 +1,6 @@
 package com.postres.controller.general;
 
+import com.postres.dto.ProductResponseDTO;
 import com.postres.dto.ProductoDTO;
 import com.postres.entity.Producto;
 import com.postres.service.Impl.CloudinaryService;
@@ -25,7 +26,7 @@ public class ProductoController {
     }
 
     @GetMapping
-    public ResponseEntity<List<Producto>> listAll() throws ServiceException {
+    public ResponseEntity<List<ProductResponseDTO>> listAll() throws ServiceException {
 
         return ResponseEntity.ok(productoService.findAllProductos());
     }
