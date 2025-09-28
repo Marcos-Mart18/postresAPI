@@ -1,6 +1,8 @@
 package com.postres.service.Impl;
 
 import com.postres.controller.exceptions.ResourceNotFoundException;
+import com.postres.dto.CategoriaDTO;
+import com.postres.dto.ProductResponseDTO;
 import com.postres.dto.ProductoDTO;
 import com.postres.entity.Categoria;
 import com.postres.entity.Estado;
@@ -13,6 +15,8 @@ import org.hibernate.service.spi.ServiceException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.Collectors;
+
 @Service
 public class ProductoServiceImpl implements ProductoService {
     private final ProductoRepository productoRepository;
@@ -116,12 +120,27 @@ public class ProductoServiceImpl implements ProductoService {
     }
 
     @Override
-    public List<Producto> findAllProductos() {
+    public List<ProductResponseDTO> findAllProductos() {
         try {
-            // Obtener y devolver la lista de productos directamente
-            return productoRepository.findAll();
+            List<Producto> productos = productoRepository.findAll();
+
+            return productos.stream()
+                    .map(producto -> new ProductResponseDTO(
+                            producto.getIdProducto(),
+                            producto.getNombre(),
+                            producto.getPrecio(),
+                            producto.getFotoUrl(),
+                            producto.getDescripcion(),
+                            producto.getCategoria() != null
+                                    ? new CategoriaDTO(
+                                    producto.getCategoria().getIdCategoria(),
+                                    producto.getCategoria().getNombre()
+                            )
+                                    : null
+                    ))
+                    .collect(Collectors.toList());
+
         } catch (Exception e) {
-            // Lanzar una excepción personalizada si ocurre algún error
             throw new ServiceException("Error al listar los productos", e);
         }
     }
