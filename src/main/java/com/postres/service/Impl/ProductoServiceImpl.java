@@ -4,6 +4,7 @@ import com.postres.controller.exceptions.ResourceNotFoundException;
 import com.postres.dto.CategoriaDTO;
 import com.postres.dto.ProductResponseDTO;
 import com.postres.dto.ProductoDTO;
+import com.postres.dto.ProductoRequestDTO;
 import com.postres.entity.Categoria;
 import com.postres.entity.Estado;
 import com.postres.entity.Producto;
@@ -13,6 +14,7 @@ import com.postres.repository.ProductoRepository;
 import com.postres.service.service.ProductoService;
 import org.hibernate.service.spi.ServiceException;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -22,11 +24,13 @@ public class ProductoServiceImpl implements ProductoService {
     private final ProductoRepository productoRepository;
     private final CategoriaRepository categoriaRepository;
     private final ProductoMapper productoMapper;
+    private final CloudinaryService cloudinaryService;
 
-    public ProductoServiceImpl(ProductoRepository productoRepository,CategoriaRepository categoriaRepository, ProductoMapper productoMapper){
+    public ProductoServiceImpl(ProductoRepository productoRepository,CategoriaRepository categoriaRepository, ProductoMapper productoMapper,CloudinaryService cloudinaryService){
         this.productoRepository=productoRepository;
         this.categoriaRepository=categoriaRepository;
         this.productoMapper=productoMapper;
+        this.cloudinaryService = cloudinaryService;
     }
 
     @Override
@@ -144,4 +148,47 @@ public class ProductoServiceImpl implements ProductoService {
             throw new ServiceException("Error al listar los productos", e);
         }
     }
+
+    @Override
+    public ProductoDTO createWithImage(ProductoRequestDTO productoRequest, MultipartFile file) {
+        try {
+            Producto producto = new Producto();
+            producto.setNombre(productoRequest.getNombre());
+            producto.setPrecio(productoRequest.getPrecio());
+            producto.setDescripcion(productoRequest.getDescripcion());
+
+            Categoria categoria = categoriaRepository.findById(productoRequest.getIdCategoria())
+                    .orElseThrow(() -> new ServiceException("Categoría no encontrada"));
+            producto.setCategoria(categoria);
+
+            producto.setIsActive('A');
+
+            producto = productoRepository.save(producto);
+
+            String imageUrl = cloudinaryService.uploadImage(file, producto.getIdProducto());
+
+            producto.setFotoUrl(imageUrl);
+
+            producto = productoRepository.save(producto);
+
+            ProductoDTO productoDTO = new ProductoDTO(
+                    producto.getIdProducto(),
+                    producto.getNombre(),
+                    producto.getPrecio(),
+                    producto.getFotoUrl(),
+                    producto.getDescripcion(),
+                    producto.getCategoria().getIdCategoria() // Se asume que necesitas devolver el id de la categoría
+            );
+
+            // Retornar el ProductoDTO con la imagen subida
+            return productoDTO;
+
+        } catch (Exception e) {
+            throw new ServiceException("Error al crear el Producto con la imagen", e);
+        }
+    }
+
+
+
+
 }

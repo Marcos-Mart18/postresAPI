@@ -2,11 +2,12 @@ package com.postres.controller.general;
 
 import com.postres.dto.ProductResponseDTO;
 import com.postres.dto.ProductoDTO;
-import com.postres.entity.Producto;
+import com.postres.dto.ProductoRequestDTO;
 import com.postres.service.Impl.CloudinaryService;
 import com.postres.service.service.ProductoService;
 import org.hibernate.service.spi.ServiceException;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -71,5 +72,23 @@ public class ProductoController {
             return "Error al subir la imagen: " + e.getMessage();
         }
     }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @PostMapping(value = "/createWithImage", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<ProductoDTO> createProductoWithImage(
+            @RequestPart("producto") ProductoRequestDTO productoRequestDTO,
+            @RequestPart("file") MultipartFile file) {
+        try {
+            ProductoDTO productoCreado = productoService.createWithImage(productoRequestDTO, file);
+            return new ResponseEntity<>(productoCreado, HttpStatus.CREATED);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+
+
+
 
 }
