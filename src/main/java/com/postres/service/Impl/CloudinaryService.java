@@ -36,7 +36,8 @@ public class CloudinaryService {
         // Parámetros de configuración para la subida
         Map<String, Object> options = ObjectUtils.asMap(
                 "folder", "productos",  // Carpeta donde se subirá la imagen
-                "public_id", productoId.toString()  // Opcional: puedes asignar un nombre único basado en el productoId
+                "public_id", productoId.toString(),  // Opcional: puedes asignar un nombre único basado en el productoId
+                "max_file_size", 5000000
         );
 
         // Subir la imagen a Cloudinary dentro de la carpeta "productos"
