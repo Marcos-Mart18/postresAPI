@@ -1,0 +1,26 @@
+version: '3.8'
+
+services:
+  oracle-db:
+    image: gvenzl/oracle-xe:latest
+    container_name: oracle-db
+    environment:
+      - ORACLE_PASSWORD=1234567
+      - ORACLE_LISTENER_PASSWORD=1234567
+      - ORACLE_CHARACTERSET=AL32UTF8
+    ports:
+      - "1521:1521"  # Puerto estándar para Oracle
+      - "5500:5500"  # Puerto de administración de Oracle
+    volumes:
+      - oracle-data:/opt/oracle/oradata
+    networks:
+      - oracle-net
+    restart: always
+
+volumes:
+  oracle-data:
+    driver: local
+
+networks:
+  oracle-net:
+    driver: bridge
