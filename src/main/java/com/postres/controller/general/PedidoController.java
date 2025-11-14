@@ -9,6 +9,9 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+import jakarta.validation.Valid;
+
 @RestController
 @RequestMapping("/api/v1/pedidos")
 public class PedidoController {
@@ -21,7 +24,7 @@ public class PedidoController {
 
     @PreAuthorize("hasRole('CLIENTE')")
     @PostMapping("/create")
-    public ResponseEntity<PedidoDTO> createByUser(@RequestBody PedidoDTO pedidoDTO, Authentication authentication) {
+    public ResponseEntity<PedidoDTO> createByUser(@RequestBody @Valid PedidoDTO pedidoDTO, Authentication authentication) {
         try {
             String username = authentication.getName();
 
@@ -30,5 +33,37 @@ public class PedidoController {
         } catch (ServiceException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }
+    }
+
+    @GetMapping
+    public ResponseEntity<List<PedidoDTO>> listAll() throws ServiceException {
+        return ResponseEntity.ok(pedidoService.findAll());
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<PedidoDTO> listById(@PathVariable Long id) throws ServiceException {
+        PedidoDTO pedidoDTO = pedidoService.findById(id);
+        return ResponseEntity.ok(pedidoDTO);
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @PostMapping
+    public ResponseEntity<PedidoDTO> create(@RequestBody @Valid PedidoDTO pedidoDTO) throws ServiceException {
+        PedidoDTO created = pedidoService.create(pedidoDTO);
+        return new ResponseEntity<>(created, HttpStatus.CREATED);
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @PutMapping("/{id}")
+    public ResponseEntity<PedidoDTO> update(@PathVariable Long id, @RequestBody @Valid PedidoDTO pedidoDTO) throws ServiceException {
+        PedidoDTO updated = pedidoService.update(id, pedidoDTO);
+        return ResponseEntity.ok(updated);
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> delete(@PathVariable Long id) throws ServiceException {
+        pedidoService.deleteById(id);
+        return ResponseEntity.noContent().build();
     }
 }
