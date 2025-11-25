@@ -66,4 +66,30 @@ public class PedidoController {
         pedidoService.deleteById(id);
         return ResponseEntity.noContent().build();
     }
+
+    @PreAuthorize("hasRole('REPARTIDOR')")
+    @PutMapping("/{id}/estado/{idEstado}")
+    public ResponseEntity<PedidoDTO> actualizarEstadoPedido(
+            @PathVariable Long id,
+            @PathVariable Long idEstado,
+            Authentication authentication) throws ServiceException {
+        
+        String username = authentication.getName();
+        PedidoDTO pedidoActualizado = pedidoService.actualizarEstado(id, idEstado, username);
+        return ResponseEntity.ok(pedidoActualizado);
+    }
+
+    @PreAuthorize("hasRole('REPARTIDOR')")
+    @GetMapping("/repartidor/mis-pedidos")
+    public ResponseEntity<List<PedidoDTO>> obtenerPedidosPorRepartidor(Authentication authentication) throws ServiceException {
+        String username = authentication.getName();
+        return ResponseEntity.ok(pedidoService.obtenerPedidosPorRepartidor(username));
+    }
+
+    @PreAuthorize("hasRole('CLIENTE')")
+    @GetMapping("/cliente/mis-pedidos")
+    public ResponseEntity<List<PedidoDTO>> obtenerPedidosPorCliente(Authentication authentication) throws ServiceException {
+        String username = authentication.getName();
+        return ResponseEntity.ok(pedidoService.obtenerPedidosPorCliente(username));
+    }
 }
