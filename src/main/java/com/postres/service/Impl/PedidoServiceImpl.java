@@ -5,6 +5,8 @@ import com.postres.dto.PedidoDTO;
 import com.postres.dto.PedidoResumenDTO;
 import com.postres.dto.PedidoDetalleViewDTO;
 import com.postres.dto.EstadoDTO;
+import com.postres.dto.ProductResponseDTO;
+import com.postres.dto.CategoriaDTO;
 import com.postres.entity.Estado;
 import com.postres.entity.Repartidor;
 import com.postres.entity.DetallePedido;
@@ -446,6 +448,24 @@ public class PedidoServiceImpl implements PedidoService {
 
         EstadoDTO est = p.getEstado() != null ? estadoMapper.toDTO(p.getEstado()) : null;
 
+        List<PedidoDetalleViewDTO.DetallePedidoItemDTO> detalles = p.getDetallePedidos().stream()
+                .map(d -> {
+                    Producto prod = d.getProducto();
+                    CategoriaDTO cat = (prod.getCategoria() != null)
+                            ? new CategoriaDTO(prod.getCategoria().getIdCategoria(), prod.getCategoria().getNombre())
+                            : null;
+                    ProductResponseDTO prodDto = new ProductResponseDTO(
+                            prod.getIdProducto(),
+                            prod.getNombre(),
+                            prod.getPrecio(),
+                            prod.getFotoUrl(),
+                            prod.getDescripcion(),
+                            cat
+                    );
+                    return new PedidoDetalleViewDTO.DetallePedidoItemDTO(d.getCantidad(), prodDto);
+                })
+                .collect(Collectors.toList());
+
         return new PedidoDetalleViewDTO(
                 p.getIdPedido(),
                 p.getNumOrden(),
@@ -456,7 +476,7 @@ public class PedidoServiceImpl implements PedidoService {
                 p.getDireccion(),
                 est,
                 obtenerNombreRepartidor(p.getRepartidor()),
-                detallePedidoMapper.toDTOs(p.getDetallePedidos())
+                detalles
         );
     }
 

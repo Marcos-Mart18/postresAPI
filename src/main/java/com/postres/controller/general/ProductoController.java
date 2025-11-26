@@ -64,9 +64,9 @@ public class ProductoController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ProductoDTO> listById(@PathVariable Long id) throws ServiceException {
-        ProductoDTO productoDTO  = productoService.findById(id);
-        return ResponseEntity.ok(productoDTO);
+    public ResponseEntity<ProductResponseDTO> listById(@PathVariable Long id) throws ServiceException {
+        ProductResponseDTO producto  = productoService.findProductById(id);
+        return ResponseEntity.ok(producto);
     }
 
     @PreAuthorize("hasRole('ADMIN')")

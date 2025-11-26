@@ -20,5 +20,13 @@ public class PedidoDetalleViewDTO {
     private String direccion;
     private EstadoDTO estado;
     private String repartidorNombre; // puede ser null
-    private List<DetallePedidoDTO> detalles;
+    private List<DetallePedidoItemDTO> detalles;
+
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class DetallePedidoItemDTO {
+        private Long cantidad;
+        private ProductResponseDTO producto;
+    }
 }
