@@ -11,9 +11,7 @@ public class UsuarioDTO {
     private Long idUsuario;
     private String username;
     private String contrasena;
-    private String nombres;
-    private String apellidos;
-    private String telefono;
-    private String direccion;
-    private String correo;
+    private String profileFotoUrl;
+    private PersonaDTO persona;
+    private Long idRepartidor;
 }

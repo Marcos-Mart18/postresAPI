@@ -53,7 +53,9 @@ public class AuthServiceImpl implements AuthService{
         // 2. Buscar el usuario para incluir datos adicionales en los tokens
         Usuario usuario = usuarioRepository.findByUsername(loginDto.getUsername())
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
-        String nombreCompleto = usuario.getNombres() + " " + usuario.getApellidos();
+        String nombreCompleto = (usuario.getPersona() != null)
+                ? (usuario.getPersona().getNombres() + " " + usuario.getPersona().getApellidos())
+                : usuario.getUsername();
 
 
         // 3. Generar Access Token
@@ -73,20 +75,13 @@ public class AuthServiceImpl implements AuthService{
                 .map(usuarioRol -> usuarioRol.getRol().getNombre())
                 .collect(Collectors.toList());
 
-        LoginResponseDto userResponse = new LoginResponseDto(
-                usuario.getIdUsuario(),
-                usuario.getNombres(),
-                usuario.getApellidos(),
-                usuario.getCorreo(),
-                usuario.getProfileFotoUrl(),
-                usuario.getUsername(),
-                roles
-        );
-
         Map<String, Object> response = new HashMap<>();
         response.put("accessToken", accessToken);
         response.put("refreshToken", refreshToken);
-        response.put("user", userResponse);
+        response.put("username", usuario.getUsername());
+        response.put("roles", roles);
+        response.put("profileFotoUrl", usuario.getProfileFotoUrl());
+        response.put("idUsuario", usuario.getIdUsuario());
 
         return response;
     }
@@ -98,33 +93,15 @@ public class AuthServiceImpl implements AuthService{
         if (usuarioRepository.existsByUsername(registerDto.getUsername())) {
             throw new RuntimeException("El usuario ya existe");
         }
-
-        if (usuarioRepository.existsByCorreo(registerDto.getCorreo())) {
-            throw new RuntimeException("El correo ya está registrado");
-        }
-
         // Buscar el rol 'CLIENTE' en la base de datos
         Rol rol = rolRepository.findByNombre("CLIENTE")  // Aquí se busca el rol por su nombre
                 .orElseThrow(() -> new RuntimeException("Rol no encontrado"));
 
-        // Crear y guardar la entidad Persona
-        Persona persona = new Persona();
-        persona.setTelefono(registerDto.getTelefono());
-        persona.setDireccion(registerDto.getDireccion());
-        persona.setIsActive('A'); // Por ejemplo, asignamos como activo
-
-        // Guardamos la persona en la base de datos
-        personaRepository.save(persona);  // Guardar la entidad persona
-
-        // Crear y guardar el usuario
+        // Crear y guardar el usuario (mínimo: username y password, foto por defecto)
         Usuario usuario = new Usuario();
         usuario.setUsername(registerDto.getUsername());
-        usuario.setCorreo(registerDto.getCorreo());
         usuario.setContrasena(passwordEncoder.encode(registerDto.getPassword()));
-        usuario.setNombres(registerDto.getNombres());
-        usuario.setDni(registerDto.getDni());
-        usuario.setApellidos(registerDto.getApellidos());
-        usuario.setPersona(persona);  // Vincular la persona con el usuario
+        usuario.setProfileFotoUrl("https://res.cloudinary.com/demo/image/upload/v1/defaults/user.png");
 
         // Crear la relación entre el usuario y el rol
         UsuarioRol usuarioRol = new UsuarioRol();
@@ -145,32 +122,15 @@ public class AuthServiceImpl implements AuthService{
         if (usuarioRepository.existsByUsername(registerDto.getUsername())) {
             throw new RuntimeException("El usuario ya existe");
         }
-        if (usuarioRepository.existsByCorreo(registerDto.getCorreo())) {
-            throw new RuntimeException("El correo ya está registrado");
-        }
 
         // Buscar el rol 'CLIENTE' en la base de datos
         Rol rol = rolRepository.findByNombre("ADMIN")  // Aquí se busca el rol por su nombre
                 .orElseThrow(() -> new RuntimeException("Rol no encontrado"));
 
-        // Crear y guardar la entidad Persona
-        Persona persona = new Persona();
-        persona.setTelefono(registerDto.getTelefono());
-        persona.setDireccion(registerDto.getDireccion());
-        persona.setIsActive('A'); // Por ejemplo, asignamos como activo
-
-        // Guardamos la persona en la base de datos
-        personaRepository.save(persona);  // Guardar la entidad persona
-
-        // Crear y guardar el usuario
+        // Crear y guardar el usuario (mínimo: username y password)
         Usuario usuario = new Usuario();
         usuario.setUsername(registerDto.getUsername());
-        usuario.setCorreo(registerDto.getCorreo());
         usuario.setContrasena(passwordEncoder.encode(registerDto.getPassword()));
-        usuario.setNombres(registerDto.getNombres());
-        usuario.setDni(registerDto.getDni());
-        usuario.setApellidos(registerDto.getApellidos());
-        usuario.setPersona(persona);  // Vincular la persona con el usuario
 
         // Crear la relación entre el usuario y el rol
         UsuarioRol usuarioRol = new UsuarioRol();
@@ -192,12 +152,8 @@ public class AuthServiceImpl implements AuthService{
             throw new RuntimeException("El usuario ya existe");
         }
 
-        if (usuarioRepository.existsByCorreo(registerRepartidorDTO.getCorreo())) {
-            throw new RuntimeException("El correo ya está registrado");
-        }
-
         // Buscar el rol 'CLIENTE' en la base de datos
-        Rol rol = rolRepository.findByNombre("USER")  // Aquí se busca el rol por su nombre
+        Rol rol = rolRepository.findByNombre("REPARTIDOR")  // Aquí se busca el rol por su nombre
                 .orElseThrow(() -> new RuntimeException("Rol no encontrado"));
 
         // Crear y guardar la entidad Repartidor
@@ -210,12 +166,9 @@ public class AuthServiceImpl implements AuthService{
         // Crear y guardar el usuario
         Usuario usuario = new Usuario();
         usuario.setUsername(registerRepartidorDTO.getUsername());
-        usuario.setCorreo(registerRepartidorDTO.getCorreo());
         usuario.setContrasena(passwordEncoder.encode(registerRepartidorDTO.getPassword()));
-        usuario.setNombres(registerRepartidorDTO.getNombres());
-        usuario.setApellidos(registerRepartidorDTO.getApellidos());
-        usuario.setDni(registerRepartidorDTO.getDni());
         usuario.setRepartidor(repartidor);  // Vincular la persona con el usuario
+        usuario.setProfileFotoUrl("https://res.cloudinary.com/demo/image/upload/v1/defaults/user.png");
 
 
         // Crear la relación entre el usuario y el rol

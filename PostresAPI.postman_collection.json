@@ -1,0 +1,267 @@
+{
+  "info": {
+    "name": "PostresAPI - Colección",
+    "_postman_id": "5a1b4c5e-9f3b-4a2d-bb3c-3e2a0f2c9e77",
+    "description": "Colección para probar los endpoints de PostresAPI con variables y tests para manejo de tokens.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:9090" },
+    { "key": "accessToken", "value": "" },
+    { "key": "refreshToken", "value": "" },
+    { "key": "username", "value": "admin" },
+    { "key": "password", "value": "admin123" },
+    { "key": "usuarioId", "value": "1" },
+    { "key": "categoriaId", "value": "1" },
+    { "key": "productoId", "value": "1" },
+    { "key": "rolId", "value": "1" },
+    { "key": "pedidoId", "value": "1" },
+    { "key": "estadoId", "value": "1" },
+    { "key": "repartidorId", "value": "1" },
+    { "key": "personaId", "value": "1" }
+  ],
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Login OK', function () { pm.response.to.have.status(200); });",
+                  "let data = {}; try { data = pm.response.json(); } catch(e) {}",
+                  "if (data.accessToken) { pm.collectionVariables.set('accessToken', data.accessToken); }",
+                  "if (data.refreshToken) { pm.collectionVariables.set('refreshToken', data.refreshToken); }",
+                  "if (data.user && data.user.username) { pm.collectionVariables.set('username', data.user.username); }"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Accept", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"{{username}}\",\n  \"password\": \"{{password}}\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "auth", "login"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Refresh Access Token",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Refresh OK', function () { pm.response.to.have.status(200); });",
+                  "let data = {}; try { data = pm.response.json(); } catch(e) {}",
+                  "if (data.accessToken) { pm.collectionVariables.set('accessToken', data.accessToken); }"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Accept", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"refreshToken\": \"{{refreshToken}}\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": { "raw": "{{baseUrl}}/api/v1/auth/refresh", "host": ["{{baseUrl}}"], "path": ["api","v1","auth","refresh"] }
+          }
+        },
+        {
+          "name": "Logout",
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Accept", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"refreshToken\": \"{{refreshToken}}\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": { "raw": "{{baseUrl}}/api/v1/auth/logout", "host": ["{{baseUrl}}"], "path": ["api","v1","auth","logout"] }
+          }
+        },
+        {
+          "name": "Register User (Cliente)",
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Accept", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"cliente1\",\n  \"password\": \"Cliente@123\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": { "raw": "{{baseUrl}}/api/v1/auth/register", "host": ["{{baseUrl}}"], "path": ["api","v1","auth","register"] }
+          }
+        },
+        {
+          "name": "Register Admin",
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Accept", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"admin\",\n  \"password\": \"Admin@123\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": { "raw": "{{baseUrl}}/api/v1/auth/registerAdmin", "host": ["{{baseUrl}}"], "path": ["api","v1","auth","registerAdmin"] }
+          }
+        },
+        {
+          "name": "Register Repartidor (ADMIN)",
+          "request": {
+            "auth": { "type": "bearer", "bearer": [ { "key": "token", "value": "{{accessToken}}", "type": "string" } ] },
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Accept", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"repartidor1\",\n  \"password\": \"Rep@123\",\n  \"codigo\": \"R-0001\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": { "raw": "{{baseUrl}}/api/v1/auth/registerRepartidor", "host": ["{{baseUrl}}"], "path": ["api","v1","auth","registerRepartidor"] }
+          }
+        },
+        {
+          "name": "Upload Profile Image (AUTH)",
+          "request": {
+            "auth": { "type": "bearer", "bearer": [ { "key": "token", "value": "{{accessToken}}", "type": "string" } ] },
+            "method": "POST",
+            "header": [ { "key": "Accept", "value": "*/*" } ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                { "key": "file", "type": "file", "src": "" }
+              ]
+            },
+            "url": { "raw": "{{baseUrl}}/api/v1/auth/uploadProfileImage/{{usuarioId}}", "host": ["{{baseUrl}}"], "path": ["api","v1","auth","uploadProfileImage", "{{usuarioId}}"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Categorias",
+      "auth": { "type": "bearer", "bearer": [ { "key": "token", "value": "{{accessToken}}", "type": "string" } ] },
+      "item": [
+        { "name": "Listar Categorias", "request": { "method": "GET", "header": [ { "key": "Accept", "value": "application/json" } ], "url": { "raw": "{{baseUrl}}/api/v1/categorias", "host": ["{{baseUrl}}"], "path": ["api","v1","categorias"] } } },
+        { "name": "Obtener Categoria por ID", "request": { "method": "GET", "header": [ { "key": "Accept", "value": "application/json" } ], "url": { "raw": "{{baseUrl}}/api/v1/categorias/{{categoriaId}}", "host": ["{{baseUrl}}"], "path": ["api","v1","categorias","{{categoriaId}}"] } } },
+        { "name": "Crear Categoria (ADMIN)", "request": { "method": "POST", "header": [ { "key": "Content-Type", "value": "application/json" } ], "body": { "mode": "raw", "raw": "{\n  \"nombre\": \"Tortas\"\n}" }, "url": { "raw": "{{baseUrl}}/api/v1/categorias", "host": ["{{baseUrl}}"], "path": ["api","v1","categorias"] } } },
+        { "name": "Actualizar Categoria (ADMIN)", "request": { "method": "PUT", "header": [ { "key": "Content-Type", "value": "application/json" } ], "body": { "mode": "raw", "raw": "{\n  \"nombre\": \"Postres\"\n}" }, "url": { "raw": "{{baseUrl}}/api/v1/categorias/{{categoriaId}}", "host": ["{{baseUrl}}"], "path": ["api","v1","categorias","{{categoriaId}}"] } } },
+        { "name": "Eliminar Categoria (ADMIN)", "request": { "method": "DELETE", "header": [], "url": { "raw": "{{baseUrl}}/api/v1/categorias/{{categoriaId}}", "host": ["{{baseUrl}}"], "path": ["api","v1","categorias","{{categoriaId}}"] } } }
+      ]
+    },
+    {
+      "name": "Productos",
+      "auth": { "type": "bearer", "bearer": [ { "key": "token", "value": "{{accessToken}}", "type": "string" } ] },
+      "item": [
+        { "name": "Listar Productos", "request": { "method": "GET", "header": [ { "key": "Accept", "value": "application/json" } ], "url": { "raw": "{{baseUrl}}/api/v1/productos", "host": ["{{baseUrl}}"], "path": ["api","v1","productos"] } } },
+        { "name": "Obtener Producto por ID", "request": { "method": "GET", "header": [ { "key": "Accept", "value": "application/json" } ], "url": { "raw": "{{baseUrl}}/api/v1/productos/{{productoId}}", "host": ["{{baseUrl}}"], "path": ["api","v1","productos","{{productoId}}"] } } },
+        { "name": "Crear Producto (ADMIN)", "request": { "method": "POST", "header": [ { "key": "Content-Type", "value": "application/json" } ], "body": { "mode": "raw", "raw": "{\n  \"nombre\": \"Cheesecake\",\n  \"precio\": 25.5,\n  \"descripcion\": \"Rico\",\n  \"idCategoria\": {{categoriaId}}\n}" }, "url": { "raw": "{{baseUrl}}/api/v1/productos", "host": ["{{baseUrl}}"], "path": ["api","v1","productos"] } } },
+        { "name": "Actualizar Producto (ADMIN)", "request": { "method": "PUT", "header": [ { "key": "Content-Type", "value": "application/json" } ], "body": { "mode": "raw", "raw": "{\n  \"nombre\": \"Pie de Limón\",\n  \"precio\": 20.0,\n  \"descripcion\": \"Refrescante\",\n  \"idCategoria\": {{categoriaId}}\n}" }, "url": { "raw": "{{baseUrl}}/api/v1/productos/{{productoId}}", "host": ["{{baseUrl}}"], "path": ["api","v1","productos","{{productoId}}"] } } },
+        { "name": "Eliminar Producto (ADMIN)", "request": { "method": "DELETE", "header": [], "url": { "raw": "{{baseUrl}}/api/v1/productos/{{productoId}}", "host": ["{{baseUrl}}"], "path": ["api","v1","productos","{{productoId}}"] } } },
+        { "name": "Upload Imagen Producto (ADMIN)", "request": { "method": "POST", "header": [ { "key": "Accept", "value": "*/*" } ], "body": { "mode": "formdata", "formdata": [ { "key": "file", "type": "file", "src": "" } ] }, "url": { "raw": "{{baseUrl}}/api/v1/productos/uploadImage/{{productoId}}", "host": ["{{baseUrl}}"], "path": ["api","v1","productos","uploadImage","{{productoId}}"] } } },
+        { "name": "Crear Producto con Imagen (ADMIN)", "request": { "method": "POST", "header": [ { "key": "Accept", "value": "*/*" } ], "body": { "mode": "formdata", "formdata": [ { "key": "producto", "type": "text", "contentType": "application/json", "value": "{\\n  \\\"nombre\\\": \\\"Brownie\\\",\\n  \\\"precio\\\": 12.5,\\n  \\\"descripcion\\\": \\\"Chocolate\\\",\\n  \\\"idCategoria\\\": {{categoriaId}}\\n}" }, { "key": "file", "type": "file", "src": "" } ] }, "url": { "raw": "{{baseUrl}}/api/v1/productos/createWithImage", "host": ["{{baseUrl}}"], "path": ["api","v1","productos","createWithImage"] } } }
+      ]
+    },
+    {
+      "name": "Pedidos",
+      "item": [
+        { "name": "Crear Pedido (CLIENTE)", "request": { "auth": { "type": "bearer", "bearer": [ { "key": "token", "value": "{{accessToken}}", "type": "string" } ] }, "method": "POST", "header": [ { "key": "Content-Type", "value": "application/json" } ], "body": { "mode": "raw", "raw": "{\n  \"fechaEntrega\": \"2030-12-31\",\n  \"horaEntrega\": \"14:30\",\n  \"total\": 99.9,\n  \"direccion\": \"Calle Siempre Viva 742\",\n  \"detalles\": [\n    { \"cantidad\": 2, \"idProducto\": {{productoId}} }\n  ]\n}" }, "url": { "raw": "{{baseUrl}}/api/v1/pedidos/create", "host": ["{{baseUrl}}"], "path": ["api","v1","pedidos","create"] } } },
+        { "name": "Listar Pedidos", "request": { "auth": { "type": "bearer", "bearer": [ { "key": "token", "value": "{{accessToken}}", "type": "string" } ] }, "method": "GET", "header": [ { "key": "Accept", "value": "application/json" } ], "url": { "raw": "{{baseUrl}}/api/v1/pedidos", "host": ["{{baseUrl}}"], "path": ["api","v1","pedidos"] } } },
+        { "name": "Obtener Pedido por ID", "request": { "auth": { "type": "bearer", "bearer": [ { "key": "token", "value": "{{accessToken}}", "type": "string" } ] }, "method": "GET", "header": [ { "key": "Accept", "value": "application/json" } ], "url": { "raw": "{{baseUrl}}/api/v1/pedidos/{{pedidoId}}", "host": ["{{baseUrl}}"], "path": ["api","v1","pedidos","{{pedidoId}}"] } } },
+        { "name": "Obtener Detalle Pedido", "request": { "auth": { "type": "bearer", "bearer": [ { "key": "token", "value": "{{accessToken}}", "type": "string" } ] }, "method": "GET", "header": [ { "key": "Accept", "value": "application/json" } ], "url": { "raw": "{{baseUrl}}/api/v1/pedidos/{{pedidoId}}/detalle", "host": ["{{baseUrl}}"], "path": ["api","v1","pedidos","{{pedidoId}}","detalle"] } } },
+        { "name": "Crear Pedido (ADMIN)", "request": { "auth": { "type": "bearer", "bearer": [ { "key": "token", "value": "{{accessToken}}", "type": "string" } ] }, "method": "POST", "header": [ { "key": "Content-Type", "value": "application/json" } ], "body": { "mode": "raw", "raw": "{\n  \"fechaEntrega\": \"2030-12-31\",\n  \"horaEntrega\": \"10:00\",\n  \"total\": 50.0,\n  \"direccion\": \"Dirección Admin\",\n  \"detalles\": [ { \"cantidad\": 1, \"idProducto\": {{productoId}} } ]\n}" }, "url": { "raw": "{{baseUrl}}/api/v1/pedidos", "host": ["{{baseUrl}}"], "path": ["api","v1","pedidos"] } } },
+        { "name": "Actualizar Pedido (ADMIN)", "request": { "auth": { "type": "bearer", "bearer": [ { "key": "token", "value": "{{accessToken}}", "type": "string" } ] }, "method": "PUT", "header": [ { "key": "Content-Type", "value": "application/json" } ], "body": { "mode": "raw", "raw": "{\n  \"fechaEntrega\": \"2031-01-01\",\n  \"horaEntrega\": \"11:00\",\n  \"total\": 70.0,\n  \"direccion\": \"Dirección Actualizada\",\n  \"estado\": { \n    \"idEstado\": {{estadoId}}\n  },\n   \"detalles\": [ { \"cantidad\": 3, \"idProducto\": {{productoId}} } ]\n}" }, "url": { "raw": "{{baseUrl}}/api/v1/pedidos/{{pedidoId}}", "host": ["{{baseUrl}}"], "path": ["api","v1","pedidos","{{pedidoId}}"] } } },
+        { "name": "Eliminar Pedido (ADMIN)", "request": { "auth": { "type": "bearer", "bearer": [ { "key": "token", "value": "{{accessToken}}", "type": "string" } ] }, "method": "DELETE", "header": [], "url": { "raw": "{{baseUrl}}/api/v1/pedidos/{{pedidoId}}", "host": ["{{baseUrl}}"], "path": ["api","v1","pedidos","{{pedidoId}}"] } } },
+        { "name": "Actualizar Estado (REPARTIDOR)", "request": { "auth": { "type": "bearer", "bearer": [ { "key": "token", "value": "{{accessToken}}", "type": "string" } ] }, "method": "PUT", "header": [], "url": { "raw": "{{baseUrl}}/api/v1/pedidos/{{pedidoId}}/estado/{{estadoId}}", "host": ["{{baseUrl}}"], "path": ["api","v1","pedidos","{{pedidoId}}","estado","{{estadoId}}"] } } },
+        { "name": "Mis Pedidos (REPARTIDOR)", "request": { "auth": { "type": "bearer", "bearer": [ { "key": "token", "value": "{{accessToken}}", "type": "string" } ] }, "method": "GET", "header": [], "url": { "raw": "{{baseUrl}}/api/v1/pedidos/repartidor/mis-pedidos", "host": ["{{baseUrl}}"], "path": ["api","v1","pedidos","repartidor","mis-pedidos"] } } },
+        { "name": "Mis Pedidos (CLIENTE)", "request": { "auth": { "type": "bearer", "bearer": [ { "key": "token", "value": "{{accessToken}}", "type": "string" } ] }, "method": "GET", "header": [], "url": { "raw": "{{baseUrl}}/api/v1/pedidos/cliente/mis-pedidos", "host": ["{{baseUrl}}"], "path": ["api","v1","pedidos","cliente","mis-pedidos"] } } },
+
+        { "name": "Aceptar Pedido (ADMIN)", "request": { "auth": { "type": "bearer", "bearer": [ { "key": "token", "value": "{{accessToken}}", "type": "string" } ] }, "method": "PUT", "header": [], "url": { "raw": "{{baseUrl}}/api/v1/pedidos/{{pedidoId}}/aceptar", "host": ["{{baseUrl}}"], "path": ["api","v1","pedidos","{{pedidoId}}","aceptar"] } } },
+        { "name": "Marcar EN_PREPARACION (ADMIN)", "request": { "auth": { "type": "bearer", "bearer": [ { "key": "token", "value": "{{accessToken}}", "type": "string" } ] }, "method": "PUT", "header": [], "url": { "raw": "{{baseUrl}}/api/v1/pedidos/{{pedidoId}}/en-preparacion", "host": ["{{baseUrl}}"], "path": ["api","v1","pedidos","{{pedidoId}}","en-preparacion"] } } },
+        { "name": "Marcar LISTO_PARA_ENTREGA (ADMIN)", "request": { "auth": { "type": "bearer", "bearer": [ { "key": "token", "value": "{{accessToken}}", "type": "string" } ] }, "method": "PUT", "header": [], "url": { "raw": "{{baseUrl}}/api/v1/pedidos/{{pedidoId}}/listo-para-entrega", "host": ["{{baseUrl}}"], "path": ["api","v1","pedidos","{{pedidoId}}","listo-para-entrega"] } } },
+        { "name": "Asignar Repartidor (ADMIN)", "request": { "auth": { "type": "bearer", "bearer": [ { "key": "token", "value": "{{accessToken}}", "type": "string" } ] }, "method": "PUT", "header": [], "url": { "raw": "{{baseUrl}}/api/v1/pedidos/{{pedidoId}}/asignar/{{repartidorId}}", "host": ["{{baseUrl}}"], "path": ["api","v1","pedidos","{{pedidoId}}","asignar","{{repartidorId}}"] } } },
+        { "name": "Cancelar Pedido (ADMIN)", "request": { "auth": { "type": "bearer", "bearer": [ { "key": "token", "value": "{{accessToken}}", "type": "string" } ] }, "method": "PUT", "header": [], "url": { "raw": "{{baseUrl}}/api/v1/pedidos/{{pedidoId}}/cancelar", "host": ["{{baseUrl}}"], "path": ["api","v1","pedidos","{{pedidoId}}","cancelar"] } }  },
+        { "name": "Iniciar Entrega (REPARTIDOR)", "request": { "auth": { "type": "bearer", "bearer": [ { "key": "token", "value": "{{accessToken}}", "type": "string" } ] }, "method": "PUT", "header": [], "url": { "raw": "{{baseUrl}}/api/v1/pedidos/{{pedidoId}}/iniciar-entrega", "host": ["{{baseUrl}}"], "path": ["api","v1","pedidos","{{pedidoId}}","iniciar-entrega"] } } },
+        { "name": "Marcar ENTREGADO (REPARTIDOR)", "request": { "auth": { "type": "bearer", "bearer": [ { "key": "token", "value": "{{accessToken}}", "type": "string" } ] }, "method": "PUT", "header": [], "url": { "raw": "{{baseUrl}}/api/v1/pedidos/{{pedidoId}}/entregado", "host": ["{{baseUrl}}"], "path": ["api","v1","pedidos","{{pedidoId}}","entregado"] } } },
+        { "name": "Agregar Detalles (CLIENTE)", "request": { "auth": { "type": "bearer", "bearer": [ { "key": "token", "value": "{{accessToken}}", "type": "string" } ] }, "method": "POST", "header": [ { "key": "Content-Type", "value": "application/json" } ], "body": { "mode": "raw", "raw": "[\n  { \"idProducto\": {{productoId}}, \"cantidad\": 2 }\n]" }, "url": { "raw": "{{baseUrl}}/api/v1/pedidos/{{pedidoId}}/detalles/agregar", "host": ["{{baseUrl}}"], "path": ["api","v1","pedidos","{{pedidoId}}","detalles","agregar"] } } }
+      ]
+    },
+    {
+      "name": "Personas",
+      "auth": { "type": "bearer", "bearer": [ { "key": "token", "value": "{{accessToken}}", "type": "string" } ] },
+      "item": [
+        { "name": "Listar Personas", "request": { "method": "GET", "header": [ { "key": "Accept", "value": "application/json" } ], "url": { "raw": "{{baseUrl}}/api/v1/personas", "host": ["{{baseUrl}}"], "path": ["api","v1","personas"] } } },
+        { "name": "Obtener Persona por ID", "request": { "method": "GET", "header": [ { "key": "Accept", "value": "application/json" } ], "url": { "raw": "{{baseUrl}}/api/v1/personas/{{personaId}}", "host": ["{{baseUrl}}"], "path": ["api","v1","personas","{{personaId}}"] } } },
+        { "name": "Crear Persona (ADMIN)", "request": { "method": "POST", "header": [ { "key": "Content-Type", "value": "application/json" } ], "body": { "mode": "raw", "raw": "{\n  \"nombres\": \"Juan\",\n  \"apellidos\": \"Perez\",\n  \"dni\": \"12345678\",\n  \"correo\": \"juan@example.com\",\n  \"telefono\": \"999888777\",\n  \"direccion\": \"Calle 123\"\n}" }, "url": { "raw": "{{baseUrl}}/api/v1/personas", "host": ["{{baseUrl}}"], "path": ["api","v1","personas"] } } },
+        { "name": "Actualizar Persona (ADMIN)", "request": { "method": "PUT", "header": [ { "key": "Content-Type", "value": "application/json" } ], "body": { "mode": "raw", "raw": "{\n  \"nombres\": \"Juan\",\n  \"apellidos\": \"Perez\",\n  \"dni\": \"12345678\",\n  \"correo\": \"juan.new@example.com\",\n  \"telefono\": \"999000111\",\n  \"direccion\": \"Av. 456\"\n}" }, "url": { "raw": "{{baseUrl}}/api/v1/personas/{{personaId}}", "host": ["{{baseUrl}}"], "path": ["api","v1","personas","{{personaId}}"] } } },
+        { "name": "Eliminar Persona (ADMIN)", "request": { "method": "DELETE", "header": [], "url": { "raw": "{{baseUrl}}/api/v1/personas/{{personaId}}", "host": ["{{baseUrl}}"], "path": ["api","v1","personas","{{personaId}}"] } } }
+      ]
+    },
+    {
+      "name": "Usuarios",
+      "auth": { "type": "bearer", "bearer": [ { "key": "token", "value": "{{accessToken}}", "type": "string" } ] },
+      "item": [
+        { "name": "Asignar Perfil a Usuario (ADMIN)", "request": { "method": "PUT", "header": [ { "key": "Content-Type", "value": "application/json" } ], "body": { "mode": "raw", "raw": "{\n  \"idPersona\": {{personaId}},\n  \"idRepartidor\": {{repartidorId}}\n}" }, "url": { "raw": "{{baseUrl}}/api/v1/usuarios/{{usuarioId}}/perfil", "host": ["{{baseUrl}}"], "path": ["api","v1","usuarios","{{usuarioId}}","perfil"] } } }
+      ]
+    },
+    {
+      "name": "Repartidores",
+      "auth": { "type": "bearer", "bearer": [ { "key": "token", "value": "{{accessToken}}", "type": "string" } ] },
+      "item": [
+        { "name": "Listar Repartidores", "request": { "method": "GET", "header": [ { "key": "Accept", "value": "application/json" } ], "url": { "raw": "{{baseUrl}}/api/v1/repartidores", "host": ["{{baseUrl}}"], "path": ["api","v1","repartidores"] } } },
+        { "name": "Obtener Repartidor por ID", "request": { "method": "GET", "header": [ { "key": "Accept", "value": "application/json" } ], "url": { "raw": "{{baseUrl}}/api/v1/repartidores/{{repartidorId}}", "host": ["{{baseUrl}}"], "path": ["api","v1","repartidores","{{repartidorId}}"] } } },
+        { "name": "Crear Repartidor (ADMIN)", "request": { "method": "POST", "header": [ { "key": "Content-Type", "value": "application/json" } ], "body": { "mode": "raw", "raw": "{\n  \"codigo\": \"R-0002\"\n}" }, "url": { "raw": "{{baseUrl}}/api/v1/repartidores", "host": ["{{baseUrl}}"], "path": ["api","v1","repartidores"] } } },
+        { "name": "Actualizar Repartidor (ADMIN)", "request": { "method": "PUT", "header": [ { "key": "Content-Type", "value": "application/json" } ], "body": { "mode": "raw", "raw": "{\n  \"codigo\": \"R-0003\"\n}" }, "url": { "raw": "{{baseUrl}}/api/v1/repartidores/{{repartidorId}}", "host": ["{{baseUrl}}"], "path": ["api","v1","repartidores","{{repartidorId}}"] } } },
+        { "name": "Eliminar Repartidor (ADMIN)", "request": { "method": "DELETE", "header": [], "url": { "raw": "{{baseUrl}}/api/v1/repartidores/{{repartidorId}}", "host": ["{{baseUrl}}"], "path": ["api","v1","repartidores","{{repartidorId}}"] } } }
+      ]
+    },
+    {
+      "name": "Roles",
+      "auth": { "type": "bearer", "bearer": [ { "key": "token", "value": "{{accessToken}}", "type": "string" } ] },
+      "item": [
+        { "name": "Listar Roles", "request": { "method": "GET", "header": [ { "key": "Accept", "value": "application/json" } ], "url": { "raw": "{{baseUrl}}/api/v1/roles", "host": ["{{baseUrl}}"], "path": ["api","v1","roles"] } } },
+        { "name": "Obtener Rol por ID", "request": { "method": "GET", "header": [ { "key": "Accept", "value": "application/json" } ], "url": { "raw": "{{baseUrl}}/api/v1/roles/{{rolId}}", "host": ["{{baseUrl}}"], "path": ["api","v1","roles","{{rolId}}"] } } },
+        { "name": "Crear Rol (ADMIN)", "request": { "method": "POST", "header": [ { "key": "Content-Type", "value": "application/json" } ], "body": { "mode": "raw", "raw": "{\n  \"nombre\": \"ADMIN\"\n}" }, "url": { "raw": "{{baseUrl}}/api/v1/roles", "host": ["{{baseUrl}}"], "path": ["api","v1","roles"] } } },
+        { "name": "Actualizar Rol (ADMIN)", "request": { "method": "PUT", "header": [ { "key": "Content-Type", "value": "application/json" } ], "body": { "mode": "raw", "raw": "{\n  \"nombre\": \"CLIENTE\"\n}" }, "url": { "raw": "{{baseUrl}}/api/v1/roles/{{rolId}}", "host": ["{{baseUrl}}"], "path": ["api","v1","roles","{{rolId}}"] } } },
+        { "name": "Eliminar Rol (ADMIN)", "request": { "method": "DELETE", "header": [], "url": { "raw": "{{baseUrl}}/api/v1/roles/{{rolId}}", "host": ["{{baseUrl}}"], "path": ["api","v1","roles","{{rolId}}"] } } }
+      ]
+    }
+  ]
+}

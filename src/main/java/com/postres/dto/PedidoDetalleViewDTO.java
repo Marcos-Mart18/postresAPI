@@ -6,23 +6,19 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 import java.util.List;
-import jakarta.validation.constraints.*;
-@AllArgsConstructor
-@NoArgsConstructor
+
 @Data
-public class PedidoDTO {
+@NoArgsConstructor
+@AllArgsConstructor
+public class PedidoDetalleViewDTO {
     private Long idPedido;
     private String numOrden;
-    @NotNull
-    @Future
+    private LocalDate fechaPedido;
     private LocalDate fechaEntrega;
-    @NotBlank
     private String horaEntrega;
-    @DecimalMin("0.0")
     private Double total;
-    @NotBlank
     private String direccion;
     private EstadoDTO estado;
+    private String repartidorNombre; // puede ser null
     private List<DetallePedidoDTO> detalles;
-
 }
