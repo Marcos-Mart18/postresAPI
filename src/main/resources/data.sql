@@ -61,8 +61,11 @@ VALUES (
 -- USUARIO: REPARTIDOR
 -------------------------------------------------------
 
+INSERT INTO PERSONA (id_persona, nombres, apellidos, dni, correo, telefono, direccion, is_active)
+VALUES (SQ_PERSONA.nextval, 'Juan', 'Repartidor', '00000003', 'juan.repartidor@example.com', '999222333', 'Av. Principal 456', 'A');
+
 INSERT INTO USUARIO (
-    id_usuario, username, contrasena, profile_foto_url, is_active, id_repartidor
+    id_usuario, username, contrasena, profile_foto_url, is_active, id_repartidor, id_persona
 )
 VALUES (
            SQ_USUARIO.nextval,
@@ -70,7 +73,8 @@ VALUES (
            '$2a$12$CvijwGchp2Sd1/Hb4uYNk.DxC46nuZAmpylZbO/xuBYccTPdr4qYW',
            'https://res.cloudinary.com/demo/image/upload/v1/defaults/user.png',
            'A',
-           (SELECT id_repartidor FROM REPARTIDOR WHERE codigo='R001')
+           (SELECT id_repartidor FROM REPARTIDOR WHERE codigo='R001'),
+           (SELECT id_persona FROM PERSONA WHERE dni='00000003')
        );
 
 -------------------------------------------------------
