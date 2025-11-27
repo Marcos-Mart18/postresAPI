@@ -46,8 +46,9 @@ public class PedidoServiceImpl implements PedidoService {
     private final DetallePedidoRepository detallePedidoRepository;
     private final ProductoRepository productoRepository;
     private final RepartidorRepository repartidorRepository;
+    private final com.postres.service.notifications.NotificationService notificationService;
 
-    public PedidoServiceImpl(PedidoRepository pedidoRepository,UsuarioRepository usuarioRepository,EstadoRepository estadoRepository,PedidoMapper pedidoMapper, EstadoMapper estadoMapper, DetallePedidoMapper detallePedidoMapper, DetallePedidoRepository detallePedidoRepository, ProductoRepository productoRepository, RepartidorRepository repartidorRepository) {
+    public PedidoServiceImpl(PedidoRepository pedidoRepository,UsuarioRepository usuarioRepository,EstadoRepository estadoRepository,PedidoMapper pedidoMapper, EstadoMapper estadoMapper, DetallePedidoMapper detallePedidoMapper, DetallePedidoRepository detallePedidoRepository, ProductoRepository productoRepository, RepartidorRepository repartidorRepository, com.postres.service.notifications.NotificationService notificationService) {
         this.pedidoRepository = pedidoRepository;
         this.usuarioRepository = usuarioRepository;
         this.estadoRepository = estadoRepository;
@@ -57,6 +58,7 @@ public class PedidoServiceImpl implements PedidoService {
         this.detallePedidoRepository = detallePedidoRepository;
         this.productoRepository = productoRepository;
         this.repartidorRepository = repartidorRepository;
+        this.notificationService = notificationService;
     }
 
     @Override
@@ -490,6 +492,10 @@ public class PedidoServiceImpl implements PedidoService {
         pedido.setEstado(estado);
         Pedido saved = pedidoRepository.save(pedido);
         PedidoDTO dto = pedidoMapper.toDTO(saved);
+        // Notificar al cliente
+        if (saved.getUsuario() != null) {
+            notificationService.notifyClienteCambioEstado(saved.getUsuario().getIdUsuario(), "PEDIDO_ACEPTADO", dto);
+        }
         return dto;
     }
 
@@ -502,6 +508,10 @@ public class PedidoServiceImpl implements PedidoService {
         pedido.setEstado(estado);
         Pedido saved = pedidoRepository.save(pedido);
         PedidoDTO dto = pedidoMapper.toDTO(saved);
+        // Notificar al cliente
+        if (saved.getUsuario() != null) {
+            notificationService.notifyClienteCambioEstado(saved.getUsuario().getIdUsuario(), "EN_PREPARACION", dto);
+        }
         return dto;
     }
 
@@ -514,6 +524,10 @@ public class PedidoServiceImpl implements PedidoService {
         pedido.setEstado(estado);
         Pedido saved = pedidoRepository.save(pedido);
         PedidoDTO dto = pedidoMapper.toDTO(saved);
+        // Notificar al cliente
+        if (saved.getUsuario() != null) {
+            notificationService.notifyClienteCambioEstado(saved.getUsuario().getIdUsuario(), "LISTO_PARA_ENTREGA", dto);
+        }
         return dto;
     }
 
@@ -529,6 +543,12 @@ public class PedidoServiceImpl implements PedidoService {
         pedido.setEstado(estado);
         Pedido saved = pedidoRepository.save(pedido);
         PedidoDTO dto = pedidoMapper.toDTO(saved);
+        // Notificar al repartidor
+        notificationService.notifyRepartidorAsignacion(idRepartidor, dto);
+        // Notificar al cliente
+        if (saved.getUsuario() != null) {
+            notificationService.notifyClienteCambioEstado(saved.getUsuario().getIdUsuario(), "PEDIDO_ASIGNADO", dto);
+        }
         return dto;
     }
 
@@ -545,6 +565,10 @@ public class PedidoServiceImpl implements PedidoService {
         pedido.setEstado(estado);
         Pedido saved = pedidoRepository.save(pedido);
         PedidoDTO dto = pedidoMapper.toDTO(saved);
+        // Notificar al cliente
+        if (saved.getUsuario() != null) {
+            notificationService.notifyClienteCambioEstado(saved.getUsuario().getIdUsuario(), "PEDIDO_CANCELADO", dto);
+        }
         return dto;
     }
 
@@ -564,6 +588,10 @@ public class PedidoServiceImpl implements PedidoService {
         pedido.setEstado(estado);
         Pedido saved = pedidoRepository.save(pedido);
         PedidoDTO dto = pedidoMapper.toDTO(saved);
+        // Notificar al cliente que la entrega inició
+        if (saved.getUsuario() != null) {
+            notificationService.notifyClienteEntregaIniciada(saved.getUsuario().getIdUsuario(), dto);
+        }
         return dto;
     }
 
@@ -582,6 +610,10 @@ public class PedidoServiceImpl implements PedidoService {
         pedido.setEstado(estado);
         Pedido saved = pedidoRepository.save(pedido);
         PedidoDTO dto = pedidoMapper.toDTO(saved);
+        // Notificar al cliente que el pedido fue entregado
+        if (saved.getUsuario() != null) {
+            notificationService.notifyClienteEntregado(saved.getUsuario().getIdUsuario(), dto);
+        }
         return dto;
     }
 

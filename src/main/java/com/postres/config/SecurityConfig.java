@@ -38,10 +38,15 @@ public class SecurityConfig {
         http.csrf(csrf -> csrf.disable())
                 .cors(cors -> cors.configurationSource(request -> {
                     CorsConfiguration config = new CorsConfiguration();
-                    config.addAllowedOriginPattern("*"); // Permitir cualquier origen
-                    config.addAllowedMethod("*"); // Permitir todos los métodos HTTP
-                    config.addAllowedHeader("*"); // Permitir todos los headers
-                    config.setAllowCredentials(true); // Permitir credenciales (cookies, Authorization)
+                    // Orígenes permitidos
+                    config.addAllowedOriginPattern("http://localhost:*");
+                    config.addAllowedOriginPattern("http://127.0.0.1:*");
+                    config.addAllowedOriginPattern("http://10.*.*.*:*");
+                    config.addAllowedOriginPattern("http://192.168.*.*:*");
+                    config.addAllowedOriginPattern("http://172.*.*.*:*");
+                    config.addAllowedMethod("*");
+                    config.addAllowedHeader("*");
+                    config.setAllowCredentials(true);
                     return config;
                 }))
                 .authorizeHttpRequests((authorize) -> {
@@ -49,6 +54,9 @@ public class SecurityConfig {
                     authorize.requestMatchers(HttpMethod.GET, "/api/v1/categorias", "/api/v1/categorias/{id}").permitAll();
                     authorize.requestMatchers(HttpMethod.GET, "/api/v1/productos", "/api/v1/productos/{id}").permitAll();
                     authorize.requestMatchers(HttpMethod.GET, "/api/v1/roles", "/api/v1/roles/{id}").permitAll();
+                    authorize.requestMatchers("/api/v1/tracking/**").permitAll(); // Tracking de repartidores
+                    authorize.requestMatchers("/ws/**").permitAll(); // WebSocket para notificaciones
+                    authorize.requestMatchers("/api/v1/notificaciones/**").permitAll(); // Notificaciones
                     authorize.requestMatchers(HttpMethod.OPTIONS, "/**").permitAll(); // Permitir preflight (CORS)
                     authorize.anyRequest().authenticated(); // Requerir autenticación para el resto
                 })
