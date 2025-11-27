@@ -150,6 +150,34 @@ public class ProductoServiceImpl implements ProductoService {
     }
 
     @Override
+    public ProductResponseDTO findProductById(Long id) {
+        try {
+            Producto producto = productoRepository.findById(id)
+                    .orElseThrow(() -> new ResourceNotFoundException("Producto no encontrado"));
+
+            CategoriaDTO categoria = producto.getCategoria() != null
+                    ? new CategoriaDTO(
+                            producto.getCategoria().getIdCategoria(),
+                            producto.getCategoria().getNombre()
+                    )
+                    : null;
+
+            return new ProductResponseDTO(
+                    producto.getIdProducto(),
+                    producto.getNombre(),
+                    producto.getPrecio(),
+                    producto.getFotoUrl(),
+                    producto.getDescripcion(),
+                    categoria
+            );
+        } catch (ResourceNotFoundException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new ServiceException("Error al leer el producto con id " + id, e);
+        }
+    }
+
+    @Override
     public ProductoDTO createWithImage(ProductoRequestDTO productoRequest, MultipartFile file) {
         try {
             Producto producto = new Producto();

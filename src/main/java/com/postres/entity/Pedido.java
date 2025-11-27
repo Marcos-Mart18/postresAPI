@@ -38,7 +38,7 @@ public class Pedido {
     @Column(name = "total",columnDefinition = "NUMBER(5,2)")
     private Double total;
 
-    @Column(name = "num_orden")
+    @Column(name = "num_orden", unique = true)
     private String numOrden;
 
     @Column(name = "direccion",columnDefinition = "varchar2(200)")

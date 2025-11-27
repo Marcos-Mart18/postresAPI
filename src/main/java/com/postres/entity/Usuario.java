@@ -25,16 +25,8 @@ public class Usuario {
     private String username;
     @Column(name = "contrasena",columnDefinition = "varchar2(200)")
     private String contrasena;
-    @Column(name = "nombres",columnDefinition = "varchar2(150)")
-    private String nombres;
-    @Column(name = "apellidos",columnDefinition = "varchar2(150)")
-    private String apellidos;
-    @Column(name = "dni",columnDefinition = "char(8)")
-    private String dni;
     @Column(name = "profile_foto_url",columnDefinition = "varchar2(200)")
     private String profileFotoUrl;
-    @Column(name = "correo",columnDefinition = "varchar2(320)")
-    private String correo;
     @Column(name = "is_active",columnDefinition = "char(1)")
     private char isActive='A';
 

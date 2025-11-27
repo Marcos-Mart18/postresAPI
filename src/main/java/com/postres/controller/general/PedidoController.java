@@ -1,6 +1,9 @@
 package com.postres.controller.general;
 
 import com.postres.dto.PedidoDTO;
+import com.postres.dto.DetallePedidoDTO;
+import com.postres.dto.PedidoResumenDTO;
+import com.postres.dto.PedidoDetalleViewDTO;
 import com.postres.service.service.PedidoService;
 import org.hibernate.service.spi.ServiceException;
 import org.springframework.http.HttpStatus;
@@ -8,6 +11,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/api/v1/pedidos")
@@ -21,7 +27,7 @@ public class PedidoController {
 
     @PreAuthorize("hasRole('CLIENTE')")
     @PostMapping("/create")
-    public ResponseEntity<PedidoDTO> createByUser(@RequestBody PedidoDTO pedidoDTO, Authentication authentication) {
+    public ResponseEntity<PedidoDTO> createByUser(@RequestBody @Valid PedidoDTO pedidoDTO, Authentication authentication) {
         try {
             String username = authentication.getName();
 
@@ -30,5 +36,125 @@ public class PedidoController {
         } catch (ServiceException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }
+    }
+
+    @GetMapping
+    public ResponseEntity<List<PedidoResumenDTO>> listAll() throws ServiceException {
+        return ResponseEntity.ok(pedidoService.listarResumenGeneral());
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<PedidoDTO> listById(@PathVariable Long id) throws ServiceException {
+        PedidoDTO pedidoDTO = pedidoService.findById(id);
+        return ResponseEntity.ok(pedidoDTO);
+    }
+
+    @GetMapping("/{id}/detalle")
+    public ResponseEntity<PedidoDetalleViewDTO> obtenerDetalle(@PathVariable Long id) throws ServiceException {
+        return ResponseEntity.ok(pedidoService.obtenerDetallePedido(id));
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @PostMapping
+    public ResponseEntity<PedidoDTO> create(@RequestBody @Valid PedidoDTO pedidoDTO) throws ServiceException {
+        PedidoDTO created = pedidoService.create(pedidoDTO);
+        return new ResponseEntity<>(created, HttpStatus.CREATED);
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @PutMapping("/{id}")
+    public ResponseEntity<PedidoDTO> update(@PathVariable Long id, @RequestBody @Valid PedidoDTO pedidoDTO) throws ServiceException {
+        PedidoDTO updated = pedidoService.update(id, pedidoDTO);
+        return ResponseEntity.ok(updated);
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> delete(@PathVariable Long id) throws ServiceException {
+        pedidoService.deleteById(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PreAuthorize("hasRole('REPARTIDOR')")
+    @PutMapping("/{id}/estado/{idEstado}")
+    public ResponseEntity<PedidoDTO> actualizarEstadoPedido(
+            @PathVariable Long id,
+            @PathVariable Long idEstado,
+            Authentication authentication) throws ServiceException {
+        
+        String username = authentication.getName();
+        PedidoDTO pedidoActualizado = pedidoService.actualizarEstado(id, idEstado, username);
+        return ResponseEntity.ok(pedidoActualizado);
+    }
+
+    @PreAuthorize("hasRole('REPARTIDOR')")
+    @GetMapping("/repartidor/mis-pedidos")
+    public ResponseEntity<List<PedidoResumenDTO>> obtenerPedidosPorRepartidor(Authentication authentication) throws ServiceException {
+        String username = authentication.getName();
+        return ResponseEntity.ok(pedidoService.obtenerResumenPorRepartidor(username));
+    }
+
+    @PreAuthorize("hasRole('CLIENTE')")
+    @GetMapping("/cliente/mis-pedidos")
+    public ResponseEntity<List<PedidoResumenDTO>> obtenerPedidosPorCliente(Authentication authentication) throws ServiceException {
+        String username = authentication.getName();
+        return ResponseEntity.ok(pedidoService.obtenerResumenPorCliente(username));
+    }
+
+    // Admin endpoints
+    @PreAuthorize("hasRole('ADMIN')")
+    @PutMapping("/{id}/aceptar")
+    public ResponseEntity<PedidoDTO> aceptar(@PathVariable Long id) {
+        return ResponseEntity.ok(pedidoService.aceptarPedido(id));
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @PutMapping("/{id}/en-preparacion")
+    public ResponseEntity<PedidoDTO> enPreparacion(@PathVariable Long id) {
+        return ResponseEntity.ok(pedidoService.marcarEnPreparacion(id));
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @PutMapping("/{id}/listo-para-entrega")
+    public ResponseEntity<PedidoDTO> listoParaEntrega(@PathVariable Long id) {
+        return ResponseEntity.ok(pedidoService.marcarListoParaEntrega(id));
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @PutMapping("/{id}/asignar/{idRepartidor}")
+    public ResponseEntity<PedidoDTO> asignar(@PathVariable Long id, @PathVariable Long idRepartidor) {
+        return ResponseEntity.ok(pedidoService.asignarRepartidor(id, idRepartidor));
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @PutMapping("/{id}/cancelar")
+    public ResponseEntity<PedidoDTO> cancelar(@PathVariable Long id) {
+        return ResponseEntity.ok(pedidoService.cancelarPedido(id));
+    }
+
+    // Repartidor endpoints
+    @PreAuthorize("hasRole('REPARTIDOR')")
+    @PutMapping("/{id}/iniciar-entrega")
+    public ResponseEntity<PedidoDTO> iniciarEntrega(@PathVariable Long id, Authentication authentication) {
+        String username = authentication.getName();
+        return ResponseEntity.ok(pedidoService.iniciarEntrega(id, username));
+    }
+
+    @PreAuthorize("hasRole('REPARTIDOR')")
+    @PutMapping("/{id}/entregado")
+    public ResponseEntity<PedidoDTO> entregado(@PathVariable Long id, Authentication authentication) {
+        String username = authentication.getName();
+        return ResponseEntity.ok(pedidoService.marcarEntregado(id, username));
+    }
+
+    // Cliente: agregar más productos al pedido
+    @PreAuthorize("hasRole('CLIENTE')")
+    @PostMapping("/{id}/detalles/agregar")
+    public ResponseEntity<PedidoDTO> agregarDetalles(@PathVariable Long id,
+                                                     @RequestBody @Valid List<DetallePedidoDTO> nuevos,
+                                                     Authentication authentication) {
+        String username = authentication.getName();
+        PedidoDTO actualizado = pedidoService.agregarDetalles(id, nuevos, username);
+        return ResponseEntity.ok(actualizado);
     }
 }

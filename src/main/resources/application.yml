@@ -17,10 +17,14 @@ spring:
       hibernate:
         dialect:
           Oracle10gDialect: org.hibernate.dialect.Oracle10gDialect
+    defer-datasource-initialization: true
+
+  sql:
+    init:
+      mode: always
+
 
 cloudinary:
   cloud-name: dbqfw5na3
   api-key: 138684441112593
   api-secret: nLP8ck5j7YYio80tR2ov4Pysu-s
-
-

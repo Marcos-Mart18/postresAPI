@@ -31,4 +31,7 @@ public class DetallePedido {
     @ManyToOne
     @JoinColumn(name = "id_producto")
     private Producto producto;
+    
+    @Column(name = "precio_unitario", columnDefinition = "NUMBER(10,2)")
+    private Double precioUnitario;
 }

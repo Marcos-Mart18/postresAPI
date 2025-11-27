@@ -11,5 +11,6 @@ import java.util.List;
 
 public interface ProductoService extends GenericService<Producto, ProductoDTO,Long> {
     List<ProductResponseDTO> findAllProductos();
+    ProductResponseDTO findProductById(Long id);
     ProductoDTO createWithImage(ProductoRequestDTO productoRequest, MultipartFile file);
 }

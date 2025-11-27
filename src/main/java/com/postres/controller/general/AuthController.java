@@ -69,6 +69,7 @@ public class AuthController {
     }
 
     //registrar repartidor
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/registerRepartidor")
     public ResponseEntity<?> registerRepartidor(@RequestBody RegisterRepartidorDTO registerRepartidorDTO) {
         try {

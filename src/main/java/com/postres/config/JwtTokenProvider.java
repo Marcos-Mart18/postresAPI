@@ -92,7 +92,9 @@ public class JwtTokenProvider {
         return Jwts.builder()
                 .setSubject(username) // Asigna el username como subject
                 .claim("roles", roles) // Agrega el rol al payload
-                .claim("nombreCompleto", usuario.getNombres() + " " + usuario.getApellidos()) // Agrega el nombre completo
+                .claim("nombreCompleto", (usuario.getPersona() != null)
+                        ? (usuario.getPersona().getNombres() + " " + usuario.getPersona().getApellidos())
+                        : username) // Agrega el nombre completo desde Persona si existe
                 .setIssuedAt(currentDate) // Fecha de creación del token
                 .setExpiration(expireDate) // Fecha de expiración
                 .signWith(key(), SignatureAlgorithm.HS256) // Firma con la clave

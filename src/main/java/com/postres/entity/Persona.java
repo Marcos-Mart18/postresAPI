@@ -21,6 +21,14 @@ public class Persona {
     @SequenceGenerator(name = "SQ_PERSONA", sequenceName = "SQ_PERSONA", allocationSize = 1)
     @Column(name = "id_persona",columnDefinition = "NUMBER")
     private Long idPersona;
+    @Column(name = "nombres",columnDefinition = "varchar2(150)")
+    private String nombres;
+    @Column(name = "apellidos",columnDefinition = "varchar2(150)")
+    private String apellidos;
+    @Column(name = "dni",columnDefinition = "char(8)")
+    private String dni;
+    @Column(name = "correo",columnDefinition = "varchar2(320)")
+    private String correo;
     @Column(name = "telefono",columnDefinition = "varchar2(15)")
     private String telefono;
     @Column(name = "direccion",columnDefinition = "varchar2(200)")
