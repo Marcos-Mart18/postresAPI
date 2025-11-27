@@ -40,6 +40,12 @@
 			<artifactId>spring-boot-starter-web</artifactId>
 		</dependency>
 
+		<!-- WebSocket para tracking en tiempo real -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-websocket</artifactId>
+		</dependency>
+
 
 		<!-- MapStruct para mapeo entre entidades y DTOs -->
 		<dependency>
@@ -136,7 +142,11 @@
 			<scope>runtime</scope>
 		</dependency>
 
-
+		<dependency>
+			<groupId>org.springdoc</groupId>
+			<artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+			<version>2.6.0</version>
+		</dependency>
 
 	</dependencies>
 
