@@ -38,7 +38,7 @@ public class SecurityConfig {
         http.csrf(csrf -> csrf.disable())
                 .cors(cors -> cors.configurationSource(request -> {
                     CorsConfiguration config = new CorsConfiguration();
-                    config.addAllowedOrigin("http://localhost:4200"); // Permitir el origen del frontend
+                    config.addAllowedOriginPattern("*"); // Permitir cualquier origen
                     config.addAllowedMethod("*"); // Permitir todos los métodos HTTP
                     config.addAllowedHeader("*"); // Permitir todos los headers
                     config.setAllowCredentials(true); // Permitir credenciales (cookies, Authorization)
